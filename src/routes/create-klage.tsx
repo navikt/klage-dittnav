@@ -8,6 +8,7 @@ import { createKlage, getDraftKlage } from '../api/api';
 import { AppContext } from '../app-context/app-context';
 import { getTitle } from '../query/get-title';
 import LoadingPage from '../loading-page/loading-page';
+import { logResumeKlage } from '../logging/amplitude';
 
 const CreateKlage = () => {
     const { search } = useLocation();
@@ -32,6 +33,21 @@ const CreateKlage = () => {
         const saksnummer = getQueryValue(query.saksnummer);
 
         getDraftKlage(temaKey, title, saksnummer)
+            .then(klage => {
+                logResumeKlage({
+                    klageId: klage.id.toString(),
+                    klageTemaKey: klage.tema,
+                    klageModifiedDate: klage.modifiedByUser,
+                    klageFritekstLength: klage.fritekst.length,
+                    klageSelectedCheckboxes: klage.checkboxesSelected.length,
+                    klageHasSaksnummer: klage.userSaksnummer !== null,
+                    klageHasInternalSaksnummer: klage.internalSaksnummer !== null,
+                    klageNumberOfVedlegg: klage.vedlegg.length,
+                    klageHasVedtakDate: klage.vedtakDate !== null,
+                    ytelse: klage.ytelse
+                });
+                return klage;
+            })
             .catch(() =>
                 createKlage({
                     fritekst: '',

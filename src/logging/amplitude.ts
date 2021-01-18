@@ -1,12 +1,6 @@
 import amplitude from 'amplitude-js';
 import { TemaKey } from '../tema/tema';
 
-const APP_NAME = 'klage-dittnav';
-
-export enum AmplitudeEvent {
-    PAGE_VIEW = 'sidevisning'
-}
-
 export enum PageIdentifier {
     KLAGESKJEMA_BEGRUNNElSE = 'KLAGESKJEMA_BEGRUNNElSE',
     KLAGESKJEMA_KVITTERING = 'KLAGESKJEMA_KVITTERING',
@@ -16,6 +10,13 @@ export enum PageIdentifier {
     INNGANG_HOVEDKATEGORIER = 'INNGANG_HOVEDKATEGORIER',
     INNGANG_KATEGORIER = 'INNGANG_KATEGORIER',
     NOT_FOUND = 'NOT_FOUND'
+}
+
+const APP_NAME = 'klage-dittnav';
+
+enum AmplitudeEvent {
+    PAGE_VIEW = 'sidevisning',
+    RESUME_KLAGE = 'gjenoppta_klage'
 }
 
 const client = amplitude.getInstance();
@@ -28,20 +29,33 @@ client.init('default', '', {
     platform: window.location.origin
 });
 
-interface ExtraEventData {
+interface PageViewEventData {
     page: PageIdentifier;
     temaKey?: TemaKey;
     title?: string;
 }
 
-interface EventData extends ExtraEventData {
-    app: string;
-    url: string;
+interface ResumeKlageEventData {
+    klageId: string;
+    klageTemaKey: TemaKey;
+    klageModifiedDate: string;
+    klageFritekstLength: number;
+    klageSelectedCheckboxes: number;
+    klageHasSaksnummer: boolean;
+    klageHasInternalSaksnummer: boolean;
+    klageNumberOfVedlegg: number;
+    klageHasVedtakDate: boolean;
+    ytelse: string;
 }
 
-async function logAmplitudeEvent(eventName: AmplitudeEvent, eventProperties: ExtraEventData) {
+type EventData = {
+    app: string;
+    url: string;
+};
+
+async function logAmplitudeEvent<T>(eventName: AmplitudeEvent, eventProperties: T) {
     return await new Promise<void>((resolve, reject) => {
-        const eventData: EventData = {
+        const eventData: EventData & T = {
             ...eventProperties,
             app: APP_NAME,
             url: window.location.href
@@ -58,8 +72,10 @@ async function logAmplitudeEvent(eventName: AmplitudeEvent, eventProperties: Ext
 }
 
 export const logPageView = (page: PageIdentifier, temaKey?: TemaKey, title?: string) =>
-    logAmplitudeEvent(AmplitudeEvent.PAGE_VIEW, {
+    logAmplitudeEvent<PageViewEventData>(AmplitudeEvent.PAGE_VIEW, {
         page,
         title,
         temaKey
     });
+
+export const logResumeKlage = (data: ResumeKlageEventData) => logAmplitudeEvent(AmplitudeEvent.RESUME_KLAGE, data);
