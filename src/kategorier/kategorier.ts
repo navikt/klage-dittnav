@@ -43,10 +43,10 @@ export const INNGANG_KATEGORIER: InngangKategori[] = [
         },
         kategorier: [
             {
-                temaKey: TemaKey.PER,
+                temaKey: TemaKey.DAG,
                 titleKey: 'LONNSKOMPENSASJON',
                 allowsAnke: false,
-                digitalKlage: [],
+                digitalKlage: [EnvString.DEV, EnvString.LOCAL],
                 digitalKlageFullmakt: false,
                 path: 'lonnskompensasjon',
                 mailAnkeUrl: {
