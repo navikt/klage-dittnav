@@ -306,7 +306,7 @@ export const INNGANG_KATEGORIER: InngangKategori[] = [
                 titleKey: 'FORELDREPENGER_GENERELL',
                 allowsAnke: true,
                 digitalKlage: [EnvString.PROD, EnvString.DEV, EnvString.LOCAL],
-                digitalKlageFullmakt: false,
+                digitalKlageFullmakt: true,
                 path: 'foreldrepenger',
                 mailKlageUrl: {
                     [Languages.nb]:
